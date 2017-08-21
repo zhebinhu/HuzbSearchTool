@@ -9,7 +9,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity" android:theme="@style/Theme.Transparent" android:windowSoftInputMode="stateVisible|stateAlwaysVisible" >
+        <activity
+            android:name=".MainActivity"
+            android:theme="@style/Theme.Transparent"
+            android:windowSoftInputMode="stateVisible|stateAlwaysVisible"
+            android:launchMode="singleTask"
+            android:excludeFromRecents="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,7 +27,6 @@
                 android:resource="@xml/app_widget_provider_info" />
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.example.huzhebin.searchtool.action.CLICK" />
             </intent-filter>
         </receiver>
     </application>

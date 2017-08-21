@@ -10,13 +10,19 @@
         android:layout_height="46dp"
         android:background="@drawable/corners_bg"
         android:orientation="horizontal"
-        android:weightSum="1">
+        android:weightSum="1"
+        android:clickable="true">
         <ImageView
+            android:id="@+id/wid_imageview"
             android:layout_width="50dp"
             android:layout_height="match_parent"
             android:paddingTop="3dp"
             android:src="@mipmap/huzb"
             android:layout_marginLeft="8dp" />
+        <TextView
+            android:id="@+id/wid_textview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 

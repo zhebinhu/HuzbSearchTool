@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">HuzbSearchTool</string>
+    <string name="drawer_open">打开设置</string>
+    <string name="drawer_close">关闭设置</string>
 </resources>

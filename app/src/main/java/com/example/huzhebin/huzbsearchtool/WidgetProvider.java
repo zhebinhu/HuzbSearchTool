@@ -8,45 +8,45 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 
+import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
+import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
+
 /**
  * Created by huzhebin on 17-8-19.
  */
 
 public class WidgetProvider extends AppWidgetProvider {
-    public static final String CLICK_ACTION = "com.example.huzhebin.searchtool.action.CLICK"; // 点击事件的广播ACTION
-
     /**
      * 每次窗口小部件被更新都调用一次该方法
      */
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
-
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
-        Intent intent = new Intent(CLICK_ACTION);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, R.id.search_bar, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        remoteViews.setOnClickPendingIntent(R.id.search_bar, pendingIntent);
-
-        for (int appWidgetId : appWidgetIds) {
-            appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+        Intent intent = new Intent(context,MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, FLAG_CANCEL_CURRENT);/*去掉动画效果要用FLAG_CANCEL_CURRENT*/
+        remoteViews.setOnClickPendingIntent(R.id.search_bar,pendingIntent);
+        for(int i= 0;i<appWidgetIds.length;i++) {
+            appWidgetManager.updateAppWidget(appWidgetIds[i], remoteViews);
         }
     }
 
-    /**
-     * 接收窗口小部件点击时发送的广播
-     */
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        super.onReceive(context, intent);
-
-        if (CLICK_ACTION.equals(intent.getAction())) {
-//            Toast.makeText(context, "hello dog!", Toast.LENGTH_SHORT).show();
-            Intent intent2 = new Intent();
-            intent2.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            intent2.setClass(context,MainActivity.class);
-            context.startActivity(intent2);
-        }
-    }
+//    /**
+//     * 接收窗口小部件点击时发送的广播
+//     */
+//    @Override
+//    public void onReceive(Context context, Intent intent) {
+//        super.onReceive(context, intent);
+//
+//        if (CLICK_ACTION.equals(intent.getAction())) {
+////            Toast.makeText(context, "hello dog!", Toast.LENGTH_SHORT).show();
+//            Intent intent2 = new Intent();
+//            intent2.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+//            intent2.setClass(context,MainActivity.class);
+//            context.startActivity(intent2);
+//        }
+//    }
 
     /**
      * 每删除一次窗口小部件就调用一次
