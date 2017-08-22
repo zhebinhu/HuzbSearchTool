@@ -1,49 +1,55 @@
 package com.example.huzhebin.huzbsearchtool;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Rect;
+import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Layout;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import com.example.huzhebin.huzbsearchtool.constant;
 
-public class MainActivity extends AppCompatActivity {
+import static android.R.attr.resource;
 
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener{
+    Toolbar search_bar;
+    View main_linearlayout;
+    DrawerLayout drawer_layout;
+    ImageView drawer_button;
+    EditText edit_text;
+    NavigationView navigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        String mean=this.getIntent().getStringExtra("mean");
         //将搜索框向下平移状态栏高度
-        Toolbar search_bar = (Toolbar) findViewById(R.id.search_toolbar);
+        search_bar = (Toolbar) findViewById(R.id.search_toolbar);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 156);
         lp.setMargins(0, getStatusBarHeight(), 0, 0);
         search_bar.setLayoutParams(lp);
         setSupportActionBar(search_bar);
         //点击空白处返回
-        View main_linearlayout = (View) findViewById(R.id.main_linearlayout);
+        main_linearlayout = (View) findViewById(R.id.main_linearlayout);
         main_linearlayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -51,16 +57,43 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //托管drawer
-        final DrawerLayout drawer_layout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ImageView drawer_button = (ImageView) findViewById(R.id.drawer_button);
+        drawer_layout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer_button = (ImageView) findViewById(R.id.drawer_button);
+        edit_text = (EditText) findViewById(R.id.edit_text);
+        drawer_layout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         drawer_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 drawer_layout.openDrawer(Gravity.LEFT);
             }
         });
+        drawer_layout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                //隐藏键盘
+                ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE))
+                        .hideSoftInputFromWindow(MainActivity.this.getCurrentFocus()
+                                .getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                //弹出键盘
+                ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).showSoftInput(edit_text,0);
+                SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
         //搜索功能
-        final EditText edit_text = (EditText) findViewById(R.id.edit_text);
         edit_text.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
@@ -72,24 +105,33 @@ public class MainActivity extends AppCompatActivity {
                     //进行搜索操作的方法，在该方法中可以加入mEditSearchUser的非空判断
                     String wd = edit_text.getText().toString();
                     if(!wd.equals(null)) {
+                        SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
+                        int flag = sharedPreferences.getInt("flag",R.id.nav_baidu);
+                        Menu menu = navigationView.getMenu();
+                        menu.findItem(flag).setChecked(true);
+                        int eid = getEngineId(flag);
                         Intent intent = new Intent();
                         intent.setAction("android.intent.action.VIEW");
-                        Uri content_url = Uri.parse("https://www.baidu.com/s?wd=" + wd);
+                        Uri content_url = Uri.parse(constant.eurl[eid] + wd);
                         intent.setData(content_url);
                         startActivity(intent);
                     }
+                    MainActivity.this.finish();
                 }
-                MainActivity.this.finish();
                 return false;
             }
         });
-        System.out.println("mean=="+mean);
-        if(mean!=null)
-        {
-            if(mean.equals("123")) {
-                drawer_layout.openDrawer(Gravity.LEFT);
-            }
-        }
+        //初始化抽屉导航栏
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setItemIconTintList(null);
+        navigationView.setNavigationItemSelectedListener(this);
+        SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
+        int flag = sharedPreferences.getInt("flag",R.id.nav_baidu);
+        Menu menu = navigationView.getMenu();
+        menu.findItem(flag).setChecked(true);
+        int eid = getEngineId(flag);
+        edit_text.setHint("使用\""+constant.ename[eid]+"\"搜索...");
+
     }
 
     //获取状态栏高度
@@ -109,9 +151,46 @@ public class MainActivity extends AppCompatActivity {
         }
         return sbar;
     }
-
+    //获得搜索引擎序号
+    protected int getEngineId(int flag){
+        switch (flag){
+            case R.id.nav_baidu:
+                return 0;
+            case R.id.nav_google:
+                return 1;
+            case R.id.nav_bing:
+                return 2;
+            case R.id.nav_zhihu:
+                return 3;
+            case R.id.nav_tmall:
+                return 4;
+            case R.id.nav_taobao:
+                return 5;
+            case R.id.nav_jingdong:
+                return 6;
+            default:
+                return 0;
+        }
+    }
     @Override
     protected void onPause() {
         super.onPause();
     }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("flag", item.getItemId());
+        item.setCheckable(true).setChecked(true);
+        editor.commit();
+        int eid = getEngineId(item.getItemId());
+        edit_text.setHint("使用\""+constant.ename[eid]+"\"搜索...");
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
 }

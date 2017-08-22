@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_baidu"
+            android:icon="@mipmap/baidu"
+            android:title="百度" />
+        <item
+            android:id="@+id/nav_google"
+            android:icon="@mipmap/google"
+            android:title="Google" />
+        <item
+            android:id="@+id/nav_bing"
+            android:icon="@mipmap/bing"
+            android:title="Bing" />
+        <item
+            android:id="@+id/nav_zhihu"
+            android:icon="@mipmap/zhihu"
+            android:title="知乎" />
+        <item
+            android:id="@+id/nav_tmall"
+            android:icon="@mipmap/tmall"
+            android:title="天猫" />
+        <item
+            android:id="@+id/nav_taobao"
+            android:icon="@mipmap/taobao"
+            android:title="淘宝" />
+        <item
+            android:id="@+id/nav_jingdong"
+            android:icon="@mipmap/jingdong"
+            android:title="京东" />
+</group>
+</menu>

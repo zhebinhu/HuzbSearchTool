@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="planets_array">
+        <item>百度</item>
+        <item>Google</item>
+        <item>Bing</item>
+        <item>知乎</item>
+        <item>天猫</item>
+        <item>淘宝</item>
+        <item>京东</item>
+    </array>
+</resources>
