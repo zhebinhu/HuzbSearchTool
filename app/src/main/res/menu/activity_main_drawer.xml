@@ -10,24 +10,25 @@
             android:icon="@mipmap/google"
             android:title="Google" />
         <item
-            android:id="@+id/nav_bing"
-            android:icon="@mipmap/bing"
-            android:title="Bing" />
+            android:id="@+id/nav_translation"
+            android:icon="@mipmap/translation"
+            android:title="翻译" />
         <item
             android:id="@+id/nav_zhihu"
             android:icon="@mipmap/zhihu"
             android:title="知乎" />
         <item
+            android:id="@+id/nav_weibo"
+            android:icon="@mipmap/weibo"
+            android:title="微博" />
+        <item
+            android:id="@+id/nav_gaodemap"
+            android:icon="@mipmap/gaodemap"
+            android:title="地图" />
+        <item
             android:id="@+id/nav_tmall"
             android:icon="@mipmap/tmall"
             android:title="天猫" />
-        <item
-            android:id="@+id/nav_taobao"
-            android:icon="@mipmap/taobao"
-            android:title="淘宝" />
-        <item
-            android:id="@+id/nav_jingdong"
-            android:icon="@mipmap/jingdong"
-            android:title="京东" />
+
 </group>
 </menu>

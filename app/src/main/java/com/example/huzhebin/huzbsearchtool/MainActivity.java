@@ -2,6 +2,7 @@ package com.example.huzhebin.huzbsearchtool;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -31,13 +32,14 @@ import com.example.huzhebin.huzbsearchtool.constant;
 import static android.R.attr.resource;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener {
     Toolbar search_bar;
     View main_linearlayout;
     DrawerLayout drawer_layout;
     ImageView drawer_button;
     EditText edit_text;
     NavigationView navigationView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +62,6 @@ public class MainActivity extends AppCompatActivity
         drawer_layout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer_button = (ImageView) findViewById(R.id.drawer_button);
         edit_text = (EditText) findViewById(R.id.edit_text);
-        drawer_layout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         drawer_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onDrawerClosed(View drawerView) {
                 //弹出键盘
-                ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).showSoftInput(edit_text,0);
+                ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).showSoftInput(edit_text, 0);
                 SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
             }
 
@@ -104,17 +105,23 @@ public class MainActivity extends AppCompatActivity
                                     .getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                     //进行搜索操作的方法，在该方法中可以加入mEditSearchUser的非空判断
                     String wd = edit_text.getText().toString();
-                    if(!wd.equals(null)) {
+                    if (!wd.equals(null)) {
                         SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
-                        int flag = sharedPreferences.getInt("flag",R.id.nav_baidu);
+                        int flag = sharedPreferences.getInt("flag", R.id.nav_baidu);
                         Menu menu = navigationView.getMenu();
                         menu.findItem(flag).setChecked(true);
                         int eid = getEngineId(flag);
-                        Intent intent = new Intent();
-                        intent.setAction("android.intent.action.VIEW");
-                        Uri content_url = Uri.parse(constant.eurl[eid] + wd);
-                        intent.setData(content_url);
-                        startActivity(intent);
+                        if(eid==5&&isAppInstalled("com.autonavi.minimap"))
+                        {
+                            startGdMap("Huzb搜索工具",wd);
+                        }
+                        else {
+                            Intent intent = new Intent();
+                            intent.setAction("android.intent.action.VIEW");
+                            Uri content_url = Uri.parse(constant.eurl[eid] + wd);
+                            intent.setData(content_url);
+                            startActivity(intent);
+                        }
                     }
                     MainActivity.this.finish();
                 }
@@ -126,16 +133,16 @@ public class MainActivity extends AppCompatActivity
         navigationView.setItemIconTintList(null);
         navigationView.setNavigationItemSelectedListener(this);
         SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
-        int flag = sharedPreferences.getInt("flag",R.id.nav_baidu);
+        int flag = sharedPreferences.getInt("flag", R.id.nav_baidu);
         Menu menu = navigationView.getMenu();
         menu.findItem(flag).setChecked(true);
         int eid = getEngineId(flag);
-        edit_text.setHint("使用\""+constant.ename[eid]+"\"搜索...");
+        edit_text.setHint("使用\"" + constant.ename[eid] + "\"搜索...");
 
     }
 
     //获取状态栏高度
-    protected int getStatusBarHeight(){
+    protected int getStatusBarHeight() {
         Class<?> c = null;
         Object obj = null;
         Field field = null;
@@ -151,27 +158,29 @@ public class MainActivity extends AppCompatActivity
         }
         return sbar;
     }
+
     //获得搜索引擎序号
-    protected int getEngineId(int flag){
-        switch (flag){
+    protected int getEngineId(int flag) {
+        switch (flag) {
             case R.id.nav_baidu:
                 return 0;
             case R.id.nav_google:
                 return 1;
-            case R.id.nav_bing:
+            case R.id.nav_translation:
                 return 2;
             case R.id.nav_zhihu:
                 return 3;
-            case R.id.nav_tmall:
+            case R.id.nav_weibo:
                 return 4;
-            case R.id.nav_taobao:
+            case R.id.nav_gaodemap:
                 return 5;
-            case R.id.nav_jingdong:
+            case R.id.nav_tmall:
                 return 6;
             default:
                 return 0;
         }
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -187,10 +196,31 @@ public class MainActivity extends AppCompatActivity
         item.setCheckable(true).setChecked(true);
         editor.commit();
         int eid = getEngineId(item.getItemId());
-        edit_text.setHint("使用\""+constant.ename[eid]+"\"搜索...");
+        edit_text.setHint("使用\"" + constant.ename[eid] + "\"搜索...");
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
+    public void startGdMap(String appName, String dname) {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        //将功能Scheme以URI的方式传入data
+        Uri uri = Uri.parse("androidamap://poi?sourceApplication=" + appName + "&keywords=" + dname + "&dev=0");
+        intent.setData(uri);
+        //启动该页面即可
+        startActivity(intent);
+    }
+    private boolean isAppInstalled(String uri){
+        PackageManager pm = getPackageManager();
+        boolean installed =false;
+        try{
+            pm.getPackageInfo(uri,PackageManager.GET_ACTIVITIES);
+            installed =true;
+        }catch(PackageManager.NameNotFoundException e){
+            installed =false;
+        }
+        return installed;
+    }
 }
